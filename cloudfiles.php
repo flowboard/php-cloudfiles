@@ -2029,7 +2029,7 @@ class CF_Object
     function public_uri()
     {
         if ($this->container->cdn_enabled) {
-            return $this->container->cdn_uri . "/" . $this->name;
+            return $this->container->cdn_uri . "/" . rawurlencode($this->name);
         }
         return NULL;
     }
@@ -2055,7 +2055,7 @@ class CF_Object
     function public_ssl_uri()
     {
         if ($this->container->cdn_enabled) {
-            return $this->container->cdn_ssl_uri . "/" . $this->name;
+            return $this->container->cdn_ssl_uri . "/" . rawurlencode($this->name);
         }
         return NULL;
     }
@@ -2080,7 +2080,8 @@ class CF_Object
     function public_streaming_uri()
     {
         if ($this->container->cdn_enabled) {
-            return $this->container->cdn_streaming_uri . "/" . $this->name;
+            return $this->container->cdn_streaming_uri . "/"
+                . rawurlencode($this->name);
         }
         return NULL;
     }
