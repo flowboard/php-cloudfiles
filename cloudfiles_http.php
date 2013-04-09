@@ -81,6 +81,8 @@ define("USER_AGENT_HEADER", "User-Agent");
  */
 class CF_Http
 {
+    protected static $CURL_FOLLOWLOCATION;
+
     private $error_str;
     private $dbug;
     private $cabundle_path;
@@ -132,6 +134,11 @@ class CF_Http
 
     function __construct($api_version)
     {
+        if (is_null(self::$CURL_FOLLOWLOCATION)) {
+            // We can use CURL_FOLLOWOCATION if open_basedir isn't set.
+            self::$CURL_FOLLOWLOCATION = (bool) !ini_get('open_basedir');
+        }
+
         $this->dbug = False;
         $this->cabundle_path = NULL;
         $this->api_version = $api_version;
@@ -245,7 +252,9 @@ class CF_Http
             curl_setopt($curl_ch, CURLOPT_CAINFO, $this->cabundle_path);
         }
         curl_setopt($curl_ch, CURLOPT_VERBOSE, $this->dbug);
-        curl_setopt($curl_ch, CURLOPT_FOLLOWLOCATION, 1);
+        if (self::$CURL_FOLLOWLOCATION) {
+            curl_setopt($curl_ch, CURLOPT_FOLLOWLOCATION, 1);
+        }
         curl_setopt($curl_ch, CURLOPT_MAXREDIRS, 4);
         curl_setopt($curl_ch, CURLOPT_HEADER, 0);
         curl_setopt($curl_ch, CURLOPT_HTTPHEADER, $headers);
@@ -1350,8 +1359,10 @@ class CF_Http
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, True);
             curl_setopt($ch, CURLOPT_CAINFO, $this->cabundle_path);
         }
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, True);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, True);
+        if (self::$CURL_FOLLOWLOCATION) {
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        }
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 4);
         curl_setopt($ch, CURLOPT_HEADER, 0);
